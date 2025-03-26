@@ -31,3 +31,4 @@ def calculate_total(subtotal):
 if __name__ == "__main__":
     subtotal = float(input("Please enter the subtotal: "))
     calculate_total(subtotal)
+
