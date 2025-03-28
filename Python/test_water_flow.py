@@ -4,6 +4,9 @@ import pytest
 from water_flow import water_column_height
 from water_flow import pressure_gain_from_water_height
 from water_flow import pressure_loss_from_pipe
+from water_flow import pressure_loss_from_fittings
+from water_flow import reynolds_number
+from water_flow import pressure_loss_from_pipe_reduction
 
 def test_water_column_height():
     assert water_column_height(0.0, 0.0) == approx(0.0)
@@ -55,6 +58,38 @@ def test_pressure_loss_from_pipe():
     result = pressure_loss_from_pipe(0.286870, 1800.75, 0.013, 1.65)
     assert abs(result + 110.884) < 0.001, f"Test failed for case 7: {result}"
 
+def test_pressure_loss_from_fittings():
+    # Test case 1
+    result = pressure_loss_from_fittings(0.00, 3)
+    assert pytest.approx(0.000, abs=0.001) == result
+
+    # Test case 2
+    result = pressure_loss_from_fittings(1.65, 0)
+    assert pytest.approx(0.000, abs=0.001) == result
+
+    # Test case 3
+    result = pressure_loss_from_fittings(1.65, 2)
+    assert pytest.approx(-0.109, abs=0.001) == result
+
+    # Test case 4
+    result = pressure_loss_from_fittings(1.75, 2)
+    assert pytest.approx(-0.122, abs=0.001) == result
+
+    # Test case 5
+    result = pressure_loss_from_fittings(1.75, 5)
+    assert pytest.approx(-0.306, abs=0.001) == result
+
+def test_reynolds_number():
+    assert pytest.approx(0, abs=1) == reynolds_number(0.048692, 0.00)
+    assert pytest.approx(80069, abs=1) == reynolds_number(0.048692, 1.65)
+    assert pytest.approx(84922, abs=1) == reynolds_number(0.048692, 1.75)
+    assert pytest.approx(471729, abs=1) == reynolds_number(0.286870, 1.65)
+    assert pytest.approx(500318, abs=1) == reynolds_number(0.286870, 1.75)
+    
+def test_pressure_loss_from_pipe_reduction():
+    assert pytest.approx(0.000, abs=0.001) == pressure_loss_from_pipe_reduction(0.28687, 0.00, 1, 0.048692)
+    assert pytest.approx(-184.182, abs=0.001) == pressure_loss_from_pipe_reduction(0.28687,1.75, 500318, 0.048692)
+    assert pytest.approx(-163.744, abs=0.001) == pressure_loss_from_pipe_reduction(0.28687, 1.65, 471729, 0.048692)
 
 
 pytest.main(["-v", "--tb=line", "-rN", __file__])
